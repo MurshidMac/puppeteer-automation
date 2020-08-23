@@ -19,6 +19,7 @@ const puppeteer = require("puppeteer");
     await ChromePuppeteerPNG(headless);
     await ChromePuppeteerPDF();
     await ChromePuppeteerSingleElement();
+    await ChromePuppeteerMeasureMetrics();
 })();   // Always call the function
 
 // screenshot function with headless option false
@@ -92,4 +93,53 @@ async function ChromePuppeteerAgents(){
     await browser.close();
 }
 
+// Puppeteer CodeCoverage
+async function ChromePuppeteerCodeCoverage(){
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    
+    await Promise.all([
+        page.coverage.startJSCoverage(),
+        page.coverage.startCSSCoverage()
+    ])    
+    await page.goto('https://google.com', {waitUntil: 'networkidle2'});
+    
+    const [jsCoverage, cssCoverage] = await Promise.all([
+        page.coverage.stopJSCoverage(),
+        page.coverage.stopCSSCoverage()
+    ])
+    
+    
+    
+    await browser.close();
+}
 
+// Measure metrics
+async function ChromePuppeteerMeasureMetrics(){
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    
+    // await Promise.all([
+    //     page.coverage.startJSCoverage(),
+    //     page.coverage.startCSSCoverage()
+    // ])    
+    await page.goto('https://google.com', {waitUntil: 'networkidle2'});
+    
+    // const [jsCoverage, cssCoverage] = await Promise.all([
+    //     page.coverage.stopJSCoverage(),
+    //     page.coverage.stopCSSCoverage()
+    // ])
+    
+    const paints = await page.evaluate(() => {
+        const result = {}
+        performance.getEntriesByType('paint').map(entry =>{
+            result[entry.name] = entry.startTime
+        })
+        return result;
+    })
+    for (const [key, val] of Object.entries(paints)){
+        console.log(`${key}: ${ Math.round (val)}ms`)
+    }
+    
+    await browser.close();
+}
