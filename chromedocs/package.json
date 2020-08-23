@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "node index.js"
+    "start": "nodemon index.js",
+    "headlesschrome": "nodemon index.js false true",
+    "test": "node index.js "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "nodemon": "^2.0.4",
     "puppeteer": "^5.2.1"
   }
 }
